@@ -127,22 +127,22 @@ Test the indexes have been created correctly:
 1.  Navigate to the search\_part directory.
 2.  Open a python3 terminal then enter:
     ```
-    dave@suse-lappy:~/git/python/skidl/search\_part> python3 search\_part.py
+    dave@suse-lappy:~/git/python/skidl/search_part> python3 search_part.py
     Create some parts as a test.
-    Generate a net list. Check the parts in kicad by importing the search\_part.net file.
+    Generate a net list. Check the parts in kicad by importing the search_part.net file.
     
     No errors or warnings found during netlist generation.
     
     Query for all footprints with 5 pads in a dip package.
-    Unnamed: 0                                 name  pad\_count            location
-    8367        8367                     DIP-5-6\_W10.16mm          5  Package\_DIP.pretty
-    8368        8368            DIP-5-6\_W10.16mm\_LongPads          5  Package\_DIP.pretty
-    8369        8369                      DIP-5-6\_W7.62mm          5  Package\_DIP.pretty
-    8370        8370             DIP-5-6\_W7.62mm\_LongPads          5  Package\_DIP.pretty
-    8371        8371  DIP-5-6\_W7.62mm\_SMDSocket\_SmallPads          5  Package\_DIP.pretty
-    8372        8372               DIP-5-6\_W7.62mm\_Socket          5  Package\_DIP.pretty
-    8373        8373      DIP-5-6\_W7.62mm\_Socket\_LongPads          5  Package\_DIP.pretty
-    8374        8374   DIP-5-6\_W8.89mm\_SMDSocket\_LongPads          5  Package\_DIP.pretty
+    Unnamed: 0                                 name  pad_count            location
+    8367        8367                     DIP-5-6_W10.16mm          5  Package_DIP.pretty
+    8368        8368            DIP-5-6_W10.16mm_LongPads          5  Package_DIP.pretty
+    8369        8369                      DIP-5-6_W7.62mm          5  Package_DIP.pretty
+    8370        8370             DIP-5-6_W7.62mm_LongPads          5  Package_DIP.pretty
+    8371        8371  DIP-5-6_W7.62mm_SMDSocket_SmallPads          5  Package_DIP.pretty
+    8372        8372               DIP-5-6_W7.62mm_Socket          5  Package_DIP.pretty
+    8373        8373      DIP-5-6_W7.62mm_Socket_LongPads          5  Package_DIP.pretty
+    8374        8374   DIP-5-6_W8.89mm_SMDSocket_LongPads          5  Package_DIP.pretty
     >>>
     ```
 If you see the above then you are ready to go. 
@@ -160,14 +160,14 @@ If not:
     circuit. 
     ```
     import skidl
-    import search\_part as sp
-    part\_creator = sp.SearchPart()
-    r5v = part\_creator.create\_part(2, "R", "R\_1206", ref="R5V", value="10k")
+    import search_part as sp
+    part_creator = sp.SearchPart()
+    r5v = part_creator.create_part(2, "R", "R_1206", ref="R5V", value="10k")
     &#x2026;
     use the part
     &#x2026;
     r5v[1] += V5
-    r5v[2] += input\_net
+    r5v[2] += input_net
     ```
 
 The voltage\_translator\_sp.py file provides example usage.
@@ -191,22 +191,22 @@ use a few operators to reduce the filtered dataset to what you want.
 
 1.  Open a python interpreter in the search\_part directory.
 ```
->>> import search\_part as sp
+>>> import search_part as sp
 >>> pp = sp.SearchPart()
->>> pp.query\_part\_return\_all(4, "conn")
-   Unnamed: 0                     part\_name  &#x2026;                                           location                         alias
-   2459          11                    CONN\_01X04  &#x2026;         D:\APPS\KiCad\share\kicad\library\conn.lib                    CONN\_01X04
-   2497          49                    CONN\_02X02  &#x2026;         D:\APPS\KiCad\share\kicad\library\conn.lib
+>>> pp.query_part_return_all(4, "conn")
+   Unnamed: 0                     part_name  &#x2026;                                           location                         alias
+   2459          11                    CONN_01X04  &#x2026;         D:\APPS\KiCad\share\kicad\library\conn.lib                    CONN_01X04
+   2497          49                    CONN_02X02  &#x2026;         D:\APPS\KiCad\share\kicad\library\conn.lib
    ...
-   3463           2           Conn\_01x03\_Shielded  &#x2026;  D:\APPS\KiCad\share\kicad\library\Connector\_Ge&#x2026;           Conn\_01x03\_Shielded
+   3463           2           Conn_01x03_Shielded  &#x2026;  D:\APPS\KiCad\share\kicad\library\Connector_Ge&#x2026;           Conn_01x03_Shielded
 
 [13 rows x 5 columns]
->>> pp.query\_footprint\_return\_all(4, "pinHeader.\*vertical")
-   Unnamed: 0                                           name  pad\_count                           location
-   918          918             FanPinHeader\_1x04\_P2.54mm\_Vertical          4                   Connector.pretty
+>>> pp.query_footprint_return_all(4, "pinHeader.*vertical")
+   Unnamed: 0                                           name  pad_count                           location
+   918          918             FanPinHeader_1x04_P2.54mm_Vertical          4                   Connector.pretty
    ...
-   4946        4946                PinHeader\_2x02\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
-   4947        4947            PinHeader\_2x02\_P2.54mm\_Vertical\_SMD          4  Connector\_PinHeader\_2.54mm.pretty
+   4946        4946                PinHeader_2x02_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
+   4947        4947            PinHeader_2x02_P2.54mm_Vertical_SMD          4  Connector_PinHeader_2.54mm.pretty
    >>>
 ```
 From these results you can see that refining the footprint name
@@ -239,7 +239,7 @@ prototyping board.
 
 1.  Try something simple:
 ```
->>> pp.query\_footprint\_return\_all(4, "pinHeader")
+>>> pp.query_footprint_return_all(4, "pinHeader")
 ```
 Returns a shipload of results starting with 'FanPinHeader' &#x2026;
 
@@ -258,19 +258,19 @@ spacing is important, they make more than one kind!
 
  Try again
 ```
->>> pp.query\_footprint\_return\_all(4, "pinHeader.\*2.54")
+>>> pp.query_footprint_return_all(4, "pinHeader.*2.54")
 ```
-Adding a '.\*' means anything can be between 'pinHeader' and '2.54'
+Adding a '\.*' means anything can be between 'pinHeader' and '2.54'
 This reduces the list to:
 ```
->>> pp.query\_footprint\_return\_all(4, "pinHeader.\*2.54")
-  Unnamed: 0                                           name  pad\_count                           location
-  918          918             FanPinHeader\_1x04\_P2.54mm\_Vertical          4                   Connector.pretty
-  4794        4794              PinHeader\_1x04\_P2.54mm\_Horizontal          4  Connector\_PinHeader\_2.54mm.pretty
-  4795        4795                PinHeader\_1x04\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
+>>> pp.query_footprint_return_all(4, "pinHeader.*2.54")
+  Unnamed: 0                                           name  pad_count                           location
+  918          918             FanPinHeader_1x04_P2.54mm_Vertical          4                   Connector.pretty
+  4794        4794              PinHeader_1x04_P2.54mm_Horizontal          4  Connector_PinHeader_2.54mm.pretty
+  4795        4795                PinHeader_1x04_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
   ...
-  4946        4946                PinHeader\_2x02\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
-  4947        4947            PinHeader\_2x02\_P2.54mm\_Vertical\_SMD          4  Connector\_PinHeader\_2.54mm.pretty
+  4946        4946                PinHeader_2x02_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
+  4947        4947            PinHeader_2x02_P2.54mm_Vertical_SMD          4  Connector_PinHeader_2.54mm.pretty
   >>>
 ```
 Looking through the list again you realise orientation needs
@@ -278,29 +278,29 @@ to be specified.
 
 Try again
 ```   
-    >>> pp.query\_footprint\_return\_all(4, "pinHeader.\*2.54.\*vertical")
-     Unnamed: 0                                           name  pad\_count                           location
-
-918          918             FanPinHeader\_1x04\_P2.54mm\_Vertical          4                   Connector.pretty
-4795        4795                PinHeader\_1x04\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
-4796        4796   PinHeader\_1x04\_P2.54mm\_Vertical\_SMD\_Pin1Left          4  Connector\_PinHeader\_2.54mm.pretty
-4797        4797  PinHeader\_1x04\_P2.54mm\_Vertical\_SMD\_Pin1Right          4  Connector\_PinHeader\_2.54mm.pretty
-4946        4946                PinHeader\_2x02\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
-4947        4947            PinHeader\_2x02\_P2.54mm\_Vertical\_SMD          4  Connector\_PinHeader\_2.54mm.pretty
->>>
+    >>> pp.query_footprint_return_all(4, "pinHeader.*2.54.*vertical")
+     Unnamed: 0                                           name  pad_count                           location
+     
+     918          918             FanPinHeader_1x04_P2.54mm_Vertical          4                   Connector.pretty
+     4795        4795                PinHeader_1x04_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
+     4796        4796   PinHeader_1x04_P2.54mm_Vertical_SMD_Pin1Left          4  Connector_PinHeader_2.54mm.pretty
+     4797        4797  PinHeader_1x04_P2.54mm_Vertical_SMD_Pin1Right          4  Connector_PinHeader_2.54mm.pretty
+     4946        4946                PinHeader_2x02_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
+     4947        4947            PinHeader_2x02_P2.54mm_Vertical_SMD          4  Connector_PinHeader_2.54mm.pretty
+     >>>
 ```
 OK getting closer I don't want no smd pin header. A bit of
 contemplation give you the realisation that the bits you want end
-with 'Vertical.
+with 'Vertical'.
 
 Try again
 ```    
-    >>> pp.query\_footprint\_return\_all(4, "pinHeader.\*2.54.\*vertical$")
-    Unnamed: 0                                name  pad\_count                           location
+    >>> pp.query_footprint_return_all(4, "pinHeader.*2.54.*vertical$")
+    Unnamed: 0                                name  pad_count                           location
 
-    918          918  FanPinHeader\_1x04\_P2.54mm\_Vertical          4                   Connector.pretty
-    4795        4795     PinHeader\_1x04\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
-    4946        4946     PinHeader\_2x02\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
+    918          918  FanPinHeader_1x04_P2.54mm_Vertical          4                   Connector.pretty
+    4795        4795     PinHeader_1x04_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
+    4946        4946     PinHeader_2x02_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
     >>>
 ```
 The $ sign at the end means that 'vertical' has to be at the end
@@ -309,10 +309,10 @@ of the line.
 Now ffs what is with the 'FanPinHeader'? It has resolutely stayed
 at the top of the list. Its got to go.
 ```
-  >>> pp.query\_footprint\_return\_all(4, "^pinHeader.\*2.54.\*vertical$")
-  Unnamed: 0                             name  pad\_count                           location
-  4795        4795  PinHeader\_1x04\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
-  4946        4946  PinHeader\_2x02\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
+  >>> pp.query_footprint_return_all(4, "^pinHeader.*2.54.*vertical$")
+  Unnamed: 0                             name  pad_count                           location
+  4795        4795  PinHeader_1x04_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
+  4946        4946  PinHeader_2x02_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
   >>>
 ```
 The '^' sign at the beginning means 'pinHeader' is the first thing
@@ -321,13 +321,11 @@ You could leave it here and search\_part will use the first
 footprint, but for completeness we will get rid of the remaining
 option by adding "\_1" to 'pinHeader'
 ```
->>> pp.query\_footprint\_return\_all(4, "^pinHeader\_1.\*2.54.\*vertical$")
-Unnamed: 0                             name  pad\_count                           location
-4795        4795  PinHeader\_1x04\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
+>>> pp.query_footprint_return_all(4, "^pinHeader_1.*2.54.*vertical$")
+Unnamed: 0                             name  pad_count                           location
+4795        4795  PinHeader_1x04_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
 >>>
 ```
-Adding the '\_1' to the 'pinHeader' removed the two row pin header.
-
 While it takes a chunk of time to read and write this process it happens quickly
 with the interpreter so the above could occur in less than 30 seconds with a
 little experience.
