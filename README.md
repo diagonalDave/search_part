@@ -39,11 +39,11 @@ Macs too.
 Creating a part with search part avoids having to know the storage
 structure of KiCad parts and footprints.
 It is intended to be simple to use:
-
+```
 import search\_ part as sp
 pc = sp.SearchPart()
 ldo = pc.create\_part(8, "LP2951.\*soic", "SOIC") #returns a skidl.Part()
-
+```
 To get this simplicity the first part or footprint on the list is
 returned, this may not be the part you want or it may blow-up
 because no parts were found. This is when you turn to the [1.4](#orgdddc04e)
@@ -104,9 +104,9 @@ is at least simple if not gratifying.
     comment.
 4.  Save the file open a cmd prompt/terminal then create an index
     with:
-    
+    ```
     python index\_footprints.py
-
+    ```
 This will take 5-10 minutes to run and generate a
 skidl\_footprint\_index.csv file.
 
@@ -126,7 +126,7 @@ Test the indexes have been created correctly:
 
 1.  Navigate to the search\_part directory.
 2.  Open a python3 terminal then enter:
-    
+    ```
     dave@suse-lappy:~/git/python/skidl/search\_part> python3 search\_part.py
     Create some parts as a test.
     Generate a net list. Check the parts in kicad by importing the search\_part.net file.
@@ -144,7 +144,7 @@ Test the indexes have been created correctly:
     8373        8373      DIP-5-6\_W7.62mm\_Socket\_LongPads          5  Package\_DIP.pretty
     8374        8374   DIP-5-6\_W8.89mm\_SMDSocket\_LongPads          5  Package\_DIP.pretty
     >>>
-
+    ```
 If you see the above then you are ready to go. 
 If not:
 
@@ -158,7 +158,7 @@ If not:
 1.  Create a python file in the search\_part directory.
 2.  Import skidl and search\_part then start building your skidl
     circuit. 
-    
+    ```
     import skidl
     import search\_part as sp
     part\_creator = sp.SearchPart()
@@ -168,7 +168,7 @@ If not:
     &#x2026;
     r5v[1] += V5
     r5v[2] += input\_net
-    \#end\_src
+    ```
 
 The voltage\_translator\_sp.py file provides example usage.
 
@@ -189,52 +189,26 @@ sent to the board file.  The process to refine a regex described below
 takes about 30 seconds at the interpreter. The regexes are simple and only
 use a few operators to reduce the filtered dataset to what you want.
 
-1.  Open a python interpreter in the searc\_part directory.
-
+1.  Open a python interpreter in the search\_part directory.
+```
 >>> import search\_part as sp
 >>> pp = sp.SearchPart()
 >>> pp.query\_part\_return\_all(4, "conn")
    Unnamed: 0                     part\_name  &#x2026;                                           location                         alias
    2459          11                    CONN\_01X04  &#x2026;         D:\APPS\KiCad\share\kicad\library\conn.lib                    CONN\_01X04
-   2497          49                    CONN\_02X02  &#x2026;         D:\APPS\KiCad\share\kicad\library\conn.lib                    CONN\_02X02
-   2702         101             Conn\_01x04\_Female  &#x2026;    D:\APPS\KiCad\share\kicad\library\Connector.lib             Conn\_01x04\_Female
-   2703         102               Conn\_01x04\_Male  &#x2026;    D:\APPS\KiCad\share\kicad\library\Connector.lib               Conn\_01x04\_Male
-   2782         181      Conn\_Coaxial\_x2\_Isolated  &#x2026;    D:\APPS\KiCad\share\kicad\library\Connector.lib      Conn\_Coaxial\_x2\_Isolated
-   2916           3                    Conn\_01x04  &#x2026;  D:\APPS\KiCad\share\kicad\library\Connector\_Ge&#x2026;                    Conn\_01x04
-   2956          43  Conn\_02x02\_Counter\_Clockwise  &#x2026;  D:\APPS\KiCad\share\kicad\library\Connector\_Ge&#x2026;  Conn\_02x02\_Counter\_Clockwise
-   2957          44           Conn\_02x02\_Odd\_Even  &#x2026;  D:\APPS\KiCad\share\kicad\library\Connector\_Ge&#x2026;           Conn\_02x02\_Odd\_Even
-   2958          45   Conn\_02x02\_Row\_Letter\_First  &#x2026;  D:\APPS\KiCad\share\kicad\library\Connector\_Ge&#x2026;   Conn\_02x02\_Row\_Letter\_First
-   2959          46    Conn\_02x02\_Row\_Letter\_Last  &#x2026;  D:\APPS\KiCad\share\kicad\library\Connector\_Ge&#x2026;    Conn\_02x02\_Row\_Letter\_Last
-   2960          47         Conn\_02x02\_Top\_Bottom  &#x2026;  D:\APPS\KiCad\share\kicad\library\Connector\_Ge&#x2026;         Conn\_02x02\_Top\_Bottom
-   3189           2        Conn\_01x03\_MountingPin  &#x2026;  D:\APPS\KiCad\share\kicad\library\Connector\_Ge&#x2026;        Conn\_01x03\_MountingPin
+   2497          49                    CONN\_02X02  &#x2026;         D:\APPS\KiCad\share\kicad\library\conn.lib
+   ...
    3463           2           Conn\_01x03\_Shielded  &#x2026;  D:\APPS\KiCad\share\kicad\library\Connector\_Ge&#x2026;           Conn\_01x03\_Shielded
 
 [13 rows x 5 columns]
 >>> pp.query\_footprint\_return\_all(4, "pinHeader.\*vertical")
    Unnamed: 0                                           name  pad\_count                           location
    918          918             FanPinHeader\_1x04\_P2.54mm\_Vertical          4                   Connector.pretty
-   3961        3961                PinHeader\_1x04\_P1.00mm\_Vertical          4  Connector\_PinHeader\_1.00mm.pretty
-   3962        3962   PinHeader\_1x04\_P1.00mm\_Vertical\_SMD\_Pin1Left          4  Connector\_PinHeader\_1.00mm.pretty
-   3963        3963  PinHeader\_1x04\_P1.00mm\_Vertical\_SMD\_Pin1Right          4  Connector\_PinHeader\_1.00mm.pretty
-   4112        4112                PinHeader\_2x02\_P1.00mm\_Vertical          4  Connector\_PinHeader\_1.00mm.pretty
-   4113        4113            PinHeader\_2x02\_P1.00mm\_Vertical\_SMD          4  Connector\_PinHeader\_1.00mm.pretty
-   4239        4239                PinHeader\_1x04\_P1.27mm\_Vertical          4  Connector\_PinHeader\_1.27mm.pretty
-   4240        4240   PinHeader\_1x04\_P1.27mm\_Vertical\_SMD\_Pin1Left          4  Connector\_PinHeader\_1.27mm.pretty
-   4241        4241  PinHeader\_1x04\_P1.27mm\_Vertical\_SMD\_Pin1Right          4  Connector\_PinHeader\_1.27mm.pretty
-   4390        4390                PinHeader\_2x02\_P1.27mm\_Vertical          4  Connector\_PinHeader\_1.27mm.pretty
-   4391        4391            PinHeader\_2x02\_P1.27mm\_Vertical\_SMD          4  Connector\_PinHeader\_1.27mm.pretty
-   4517        4517                PinHeader\_1x04\_P2.00mm\_Vertical          4  Connector\_PinHeader\_2.00mm.pretty
-   4518        4518   PinHeader\_1x04\_P2.00mm\_Vertical\_SMD\_Pin1Left          4  Connector\_PinHeader\_2.00mm.pretty
-   4519        4519  PinHeader\_1x04\_P2.00mm\_Vertical\_SMD\_Pin1Right          4  Connector\_PinHeader\_2.00mm.pretty
-   4668        4668                PinHeader\_2x02\_P2.00mm\_Vertical          4  Connector\_PinHeader\_2.00mm.pretty
-   4669        4669            PinHeader\_2x02\_P2.00mm\_Vertical\_SMD          4  Connector\_PinHeader\_2.00mm.pretty
-   4795        4795                PinHeader\_1x04\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
-   4796        4796   PinHeader\_1x04\_P2.54mm\_Vertical\_SMD\_Pin1Left          4  Connector\_PinHeader\_2.54mm.pretty
-   4797        4797  PinHeader\_1x04\_P2.54mm\_Vertical\_SMD\_Pin1Right          4  Connector\_PinHeader\_2.54mm.pretty
+   ...
    4946        4946                PinHeader\_2x02\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
    4947        4947            PinHeader\_2x02\_P2.54mm\_Vertical\_SMD          4  Connector\_PinHeader\_2.54mm.pretty
    >>>
-
+```
 From these results you can see that refining the footprint name
 will be needed to get the right spacing and orientation, see
 [1.5.1](#org2f95ea5) for an example of refining the footprint name.
@@ -264,9 +238,9 @@ Let's start with a standard 4 pin header used on just about any
 prototyping board. 
 
 1.  Try something simple:
-
+```
 >>> pp.query\_footprint\_return\_all(4, "pinHeader")
-
+```
 Returns a shipload of results starting with 'FanPinHeader' &#x2026;
 
 There are two possibilities here:
@@ -282,30 +256,28 @@ The following describes how to refine the regex.
 Looking at these results you realise that specifying the pin
 spacing is important, they make more than one kind!
 
-1.  Try again
-
+ Try again
+```
 >>> pp.query\_footprint\_return\_all(4, "pinHeader.\*2.54")
-
+```
 Adding a '.\*' means anything can be between 'pinHeader' and '2.54'
 This reduces the list to:
-
+```
 >>> pp.query\_footprint\_return\_all(4, "pinHeader.\*2.54")
   Unnamed: 0                                           name  pad\_count                           location
   918          918             FanPinHeader\_1x04\_P2.54mm\_Vertical          4                   Connector.pretty
   4794        4794              PinHeader\_1x04\_P2.54mm\_Horizontal          4  Connector\_PinHeader\_2.54mm.pretty
   4795        4795                PinHeader\_1x04\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
-  4796        4796   PinHeader\_1x04\_P2.54mm\_Vertical\_SMD\_Pin1Left          4  Connector\_PinHeader\_2.54mm.pretty
-  4797        4797  PinHeader\_1x04\_P2.54mm\_Vertical\_SMD\_Pin1Right          4  Connector\_PinHeader\_2.54mm.pretty
-  4945        4945              PinHeader\_2x02\_P2.54mm\_Horizontal          4  Connector\_PinHeader\_2.54mm.pretty
+  ...
   4946        4946                PinHeader\_2x02\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
   4947        4947            PinHeader\_2x02\_P2.54mm\_Vertical\_SMD          4  Connector\_PinHeader\_2.54mm.pretty
   >>>
-
+```
 Looking through the list again you realise orientation needs
 to be specified.
 
-1.  Try again
-    
+Try again
+```   
     >>> pp.query\_footprint\_return\_all(4, "pinHeader.\*2.54.\*vertical")
      Unnamed: 0                                           name  pad\_count                           location
 
@@ -316,44 +288,44 @@ to be specified.
 4946        4946                PinHeader\_2x02\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
 4947        4947            PinHeader\_2x02\_P2.54mm\_Vertical\_SMD          4  Connector\_PinHeader\_2.54mm.pretty
 >>>
-
+```
 OK getting closer I don't want no smd pin header. A bit of
 contemplation give you the realisation that the bits you want end
 with 'Vertical.
 
-1.  Try again
-    
+Try again
+```    
     >>> pp.query\_footprint\_return\_all(4, "pinHeader.\*2.54.\*vertical$")
     Unnamed: 0                                name  pad\_count                           location
 
-918          918  FanPinHeader\_1x04\_P2.54mm\_Vertical          4                   Connector.pretty
-4795        4795     PinHeader\_1x04\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
-4946        4946     PinHeader\_2x02\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
->>>
-
+    918          918  FanPinHeader\_1x04\_P2.54mm\_Vertical          4                   Connector.pretty
+    4795        4795     PinHeader\_1x04\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
+    4946        4946     PinHeader\_2x02\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
+    >>>
+```
 The $ sign at the end means that 'vertical' has to be at the end
 of the line.
 
 Now ffs what is with the 'FanPinHeader'? It has resolutely stayed
 at the top of the list. Its got to go.
-
->>> pp.query\_footprint\_return\_all(4, "^pinHeader.\*2.54.\*vertical$")
+```
+  >>> pp.query\_footprint\_return\_all(4, "^pinHeader.\*2.54.\*vertical$")
   Unnamed: 0                             name  pad\_count                           location
   4795        4795  PinHeader\_1x04\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
   4946        4946  PinHeader\_2x02\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
   >>>
-
+```
 The '^' sign at the beginning means 'pinHeader' is the first thing
 on the line.
 You could leave it here and search\_part will use the first
 footprint, but for completeness we will get rid of the remaining
 option by adding "\_1" to 'pinHeader'
-
+```
 >>> pp.query\_footprint\_return\_all(4, "^pinHeader\_1.\*2.54.\*vertical$")
 Unnamed: 0                             name  pad\_count                           location
 4795        4795  PinHeader\_1x04\_P2.54mm\_Vertical          4  Connector\_PinHeader\_2.54mm.pretty
 >>>
-
+```
 Adding the '\_1' to the 'pinHeader' removed the two row pin header.
 
 While it takes a chunk of time to read and write this process it happens quickly
