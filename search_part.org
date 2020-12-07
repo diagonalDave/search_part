@@ -1,0 +1,297 @@
+#+OPTIONS: ^:nil
+* Search Part
+  Search part is a proof of concept (POC) part creator for SKIDL. 
+ 
+  Currently the code is good enough for my purposes "Works on my
+  machine "(TM). But may also be useful for others wishing to use SKIDL more easily.
+
+  The main purpose of this POC is to see if it is worthwhile to work it into
+  SKIDL, provide tests, back port to Python 2 (man get with the times
+  f-strings are worth it alone) and all the other stuff to make it robust and
+  reliable on all platforms.
+ 
+  It currently has only been tested on Python 3.8 and pandas 1.15 Windows10
+  and Python 3.6 and pandas 1.15 on Suse Leap 15.2. Hopefully it will work on
+  Macs too.
+
+** Info
+  Creating a part with search part avoids having to know the storage
+  structure of KiCad parts and footprints.
+  It is intended to be simple to use:
+  # begin_src
+     import search_ part as sp
+     pc = sp.SearchPart()
+     ldo = pc.create_part(8, "LP2951.*soic", "SOIC") #returns a skidl.Part()
+   # end_src
+  To get this simplicity the first part or footprint on the list is
+  returned, this may not be the part you want or it may blow-up
+  because no parts were found. This is when you turn to the [[Search part tools]]
+  section below.
+
+  The function create_part is a skidl.Part() wrapper that takes parameters that most designers know:
+  1. *pin_count*
+  2. *part_name*--this can be a partial name and is in fact a regex so
+     regex symbols can be used. Search_part provides some tools that
+     can help narrow your part search to the correct one. 
+     See [[Search part tools][Search part tools]] section below.
+  3. *footprint_name*, this can be a partial name and is also a 
+     regex. See [[Search part tools][Search part tools]].
+  4. *pad_count*, this by default is set to the pin_count but sometimes
+     these are different. 
+  5. ***kwargs*, add any key word args you want to pass through to skidl.Part()
+  
+** Installation
+   The installation of search_part has two parts:
+   1. Download and get it setup. 
+   2. Create the indexes.
+*** Download and setup
+    1. Download or clone the repository onto your system.
+    2. pip install pandas 1.15 to the python environment you intend using.
+    3. Make sure skidl is installed ;)
+    4. Navigate to the search_part directory. You shoud see:
+       - search_parts.py
+       - a couple of example files: voltage_translator_board_sp.py and a comparable
+         voltage_translator_board.py skidl only file.
+       - indexes directory that has two .py files.
+       - pcb_files directory with some pcb files that use the generated .net files.
+*** Create the indexes
+    There are a lot of ways this could be done but using a stone axe
+    is at least simple if not gratifying.
+    1. Navigate to the indexes directory. There are two .py files, if
+       the names are confusing stop now this isn't going to work.
+    2. Open index_footprints.py in an editor then head to the bottom
+       of the file.
+    3. Replace the file path with the one to your kicad *modules*
+       directory, some hints are given for common directories in the
+       comment.
+    4. Save the file open a cmd prompt/terminal then create an index
+       with:
+       # begin_src
+         python index_footprints.py
+       # end_src
+    This will take 5-10 minutes to run and generate a
+    skidl_footprint_index.csv file.
+    5. Repeat steps 2-4 with the index_parts.py file and your kicad
+       *library* directory.
+    Once this has run for its 5-10 mins it will generate a
+    skidl_parts_index.csv file.
+    6. Check the logs to see how it went. Typically all footprint
+       files index correctly and there are four part files that wind up in the
+       logs. I will look at these when I have a chance.If you need to
+       use parts from these files you will have to use skidl.Part() to
+       get them on the board.
+    Test the indexes have been created correctly:
+    1. Navigate to the search_part directory.
+    2. Open a python3 terminal then enter:
+       # begin_src
+       dave@suse-lappy:~/git/python/skidl/search_part> python3 search_part.py
+       Create some parts as a test.
+       Generate a net list. Check the parts in kicad by importing the search_part.net file.
+
+       No errors or warnings found during netlist generation.
+       
+       Query for all footprints with 5 pads in a dip package.
+       Unnamed: 0                                 name  pad_count            location
+       8367        8367                     DIP-5-6_W10.16mm          5  Package_DIP.pretty
+       8368        8368            DIP-5-6_W10.16mm_LongPads          5  Package_DIP.pretty
+       8369        8369                      DIP-5-6_W7.62mm          5  Package_DIP.pretty
+       8370        8370             DIP-5-6_W7.62mm_LongPads          5  Package_DIP.pretty
+       8371        8371  DIP-5-6_W7.62mm_SMDSocket_SmallPads          5  Package_DIP.pretty
+       8372        8372               DIP-5-6_W7.62mm_Socket          5  Package_DIP.pretty
+       8373        8373      DIP-5-6_W7.62mm_Socket_LongPads          5  Package_DIP.pretty
+       8374        8374   DIP-5-6_W8.89mm_SMDSocket_LongPads          5  Package_DIP.pretty
+       >>>
+       # end_src
+    If you see the above then you are ready to go. 
+    If not:
+       1. Check the index logs and the index.csv files (they should both be around 1MB in size).
+** Basic Usage
+    1. Create a python file in the search_part directory.
+    2. Import skidl and search_part then start building your skidl
+       circuit. 
+       # begin_src
+       import skidl
+       import search_part as sp
+       part_creator = sp.SearchPart()
+       r5v = part_creator.create_part(2, "R", "R_1206", ref="R5V", value="10k")
+       ...
+       use the part
+       ...
+       r5v[1] += V5
+       r5v[2] += input_net
+       #end_src
+    The voltage_translator_sp.py file provides example usage.
+** Search part tools
+   Two further functions are provided with search_part that allow you
+   to interogate the indexes: query_part_return_all(pin_count,
+   part_name) and query_footprint_return_all(pad_count,
+   footprint_name)
+   
+   Search_part uses case insensitive regexes to filter the dataset it then
+   uses the first record to create the part. This is simple but can cause an
+   exception if nothing is returned or you get the wrong part or footprint
+   sent to the board file.  The process to refine a regex described below
+   takes about 30 seconds at the interpreter. The regexes are simple and only
+   use a few operators to reduce the filtered dataset to what you want.
+
+
+   1. Open a python interpreter in the searc_part directory.
+   # begin_src
+   >>> import search_part as sp
+   >>> pp = sp.SearchPart()
+   >>> pp.query_part_return_all(4, "conn")
+      Unnamed: 0                     part_name  ...                                           location                         alias
+      2459          11                    CONN_01X04  ...         D:\APPS\KiCad\share\kicad\library\conn.lib                    CONN_01X04
+      2497          49                    CONN_02X02  ...         D:\APPS\KiCad\share\kicad\library\conn.lib                    CONN_02X02
+      2702         101             Conn_01x04_Female  ...    D:\APPS\KiCad\share\kicad\library\Connector.lib             Conn_01x04_Female
+      2703         102               Conn_01x04_Male  ...    D:\APPS\KiCad\share\kicad\library\Connector.lib               Conn_01x04_Male
+      2782         181      Conn_Coaxial_x2_Isolated  ...    D:\APPS\KiCad\share\kicad\library\Connector.lib      Conn_Coaxial_x2_Isolated
+      2916           3                    Conn_01x04  ...  D:\APPS\KiCad\share\kicad\library\Connector_Ge...                    Conn_01x04
+      2956          43  Conn_02x02_Counter_Clockwise  ...  D:\APPS\KiCad\share\kicad\library\Connector_Ge...  Conn_02x02_Counter_Clockwise
+      2957          44           Conn_02x02_Odd_Even  ...  D:\APPS\KiCad\share\kicad\library\Connector_Ge...           Conn_02x02_Odd_Even
+      2958          45   Conn_02x02_Row_Letter_First  ...  D:\APPS\KiCad\share\kicad\library\Connector_Ge...   Conn_02x02_Row_Letter_First
+      2959          46    Conn_02x02_Row_Letter_Last  ...  D:\APPS\KiCad\share\kicad\library\Connector_Ge...    Conn_02x02_Row_Letter_Last
+      2960          47         Conn_02x02_Top_Bottom  ...  D:\APPS\KiCad\share\kicad\library\Connector_Ge...         Conn_02x02_Top_Bottom
+      3189           2        Conn_01x03_MountingPin  ...  D:\APPS\KiCad\share\kicad\library\Connector_Ge...        Conn_01x03_MountingPin
+      3463           2           Conn_01x03_Shielded  ...  D:\APPS\KiCad\share\kicad\library\Connector_Ge...           Conn_01x03_Shielded
+      
+   [13 rows x 5 columns]
+   >>> pp.query_footprint_return_all(4, "pinHeader.*vertical")
+      Unnamed: 0                                           name  pad_count                           location
+      918          918             FanPinHeader_1x04_P2.54mm_Vertical          4                   Connector.pretty
+      3961        3961                PinHeader_1x04_P1.00mm_Vertical          4  Connector_PinHeader_1.00mm.pretty
+      3962        3962   PinHeader_1x04_P1.00mm_Vertical_SMD_Pin1Left          4  Connector_PinHeader_1.00mm.pretty
+      3963        3963  PinHeader_1x04_P1.00mm_Vertical_SMD_Pin1Right          4  Connector_PinHeader_1.00mm.pretty
+      4112        4112                PinHeader_2x02_P1.00mm_Vertical          4  Connector_PinHeader_1.00mm.pretty
+      4113        4113            PinHeader_2x02_P1.00mm_Vertical_SMD          4  Connector_PinHeader_1.00mm.pretty
+      4239        4239                PinHeader_1x04_P1.27mm_Vertical          4  Connector_PinHeader_1.27mm.pretty
+      4240        4240   PinHeader_1x04_P1.27mm_Vertical_SMD_Pin1Left          4  Connector_PinHeader_1.27mm.pretty
+      4241        4241  PinHeader_1x04_P1.27mm_Vertical_SMD_Pin1Right          4  Connector_PinHeader_1.27mm.pretty
+      4390        4390                PinHeader_2x02_P1.27mm_Vertical          4  Connector_PinHeader_1.27mm.pretty
+      4391        4391            PinHeader_2x02_P1.27mm_Vertical_SMD          4  Connector_PinHeader_1.27mm.pretty
+      4517        4517                PinHeader_1x04_P2.00mm_Vertical          4  Connector_PinHeader_2.00mm.pretty
+      4518        4518   PinHeader_1x04_P2.00mm_Vertical_SMD_Pin1Left          4  Connector_PinHeader_2.00mm.pretty
+      4519        4519  PinHeader_1x04_P2.00mm_Vertical_SMD_Pin1Right          4  Connector_PinHeader_2.00mm.pretty
+      4668        4668                PinHeader_2x02_P2.00mm_Vertical          4  Connector_PinHeader_2.00mm.pretty
+      4669        4669            PinHeader_2x02_P2.00mm_Vertical_SMD          4  Connector_PinHeader_2.00mm.pretty
+      4795        4795                PinHeader_1x04_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
+      4796        4796   PinHeader_1x04_P2.54mm_Vertical_SMD_Pin1Left          4  Connector_PinHeader_2.54mm.pretty
+      4797        4797  PinHeader_1x04_P2.54mm_Vertical_SMD_Pin1Right          4  Connector_PinHeader_2.54mm.pretty
+      4946        4946                PinHeader_2x02_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
+      4947        4947            PinHeader_2x02_P2.54mm_Vertical_SMD          4  Connector_PinHeader_2.54mm.pretty
+      >>>
+   # end_src
+
+   From these results you can see that refining the footprint name
+   will be needed to get the right spacing and orientation, see
+   [[Refine your regex]] for an example of refining the footprint name.
+** Examples
+   Some example files have been provided in the search_part directory
+   to illustrate skidl and search_part usage. There is nothing high
+   falutin' about the examples and I expect it will change as I become
+   more familiar with skidl for pcbs. 
+   voltage_translator_board_sp.py is the search_part/skidl version
+   voltage_translator_board.py is the skidl only version this board was
+   layed out and sent for fabrication.
+*** Refine your regex
+    To be blunt regexes can be painful, hopefully this section will
+    allow you to easily get the part or footprint to the top of the
+    filtered list.
+    Let's start with a standard 4 pin header used on just about any
+    prototyping board. 
+    1. Try something simple: 
+    # begin_src
+     >>> pp.query_footprint_return_all(4, "pinHeader")
+    # end_src
+    Returns a shipload of results starting with 'FanPinHeader' ...
+    
+    There are two possibilities here:
+      - search the list manually, find your part and  copy and paste the full text into
+      create_part. You are now done. Or;
+      - refine the regex. 
+    
+    The following describes how to refine the regex.
+
+    Looking at these results you realise that specifying the pin
+    spacing is important, they make more than one kind!
+
+    2. Try again
+    # begin_src
+     >>> pp.query_footprint_return_all(4, "pinHeader.*2.54")
+    # end_src
+    Adding a '.*' means anything can be between 'pinHeader' and '2.54'
+    This reduces the list to:
+    # begin_src
+    >>> pp.query_footprint_return_all(4, "pinHeader.*2.54")
+      Unnamed: 0                                           name  pad_count                           location
+      918          918             FanPinHeader_1x04_P2.54mm_Vertical          4                   Connector.pretty
+      4794        4794              PinHeader_1x04_P2.54mm_Horizontal          4  Connector_PinHeader_2.54mm.pretty
+      4795        4795                PinHeader_1x04_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
+      4796        4796   PinHeader_1x04_P2.54mm_Vertical_SMD_Pin1Left          4  Connector_PinHeader_2.54mm.pretty
+      4797        4797  PinHeader_1x04_P2.54mm_Vertical_SMD_Pin1Right          4  Connector_PinHeader_2.54mm.pretty
+      4945        4945              PinHeader_2x02_P2.54mm_Horizontal          4  Connector_PinHeader_2.54mm.pretty
+      4946        4946                PinHeader_2x02_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
+      4947        4947            PinHeader_2x02_P2.54mm_Vertical_SMD          4  Connector_PinHeader_2.54mm.pretty
+      >>>
+    # end_src
+
+    Looking through the list again you realise orientation needs
+    to be specified.
+
+    3. Try again
+       # begin_src
+     >>> pp.query_footprint_return_all(4, "pinHeader.*2.54.*vertical")
+      Unnamed: 0                                           name  pad_count                           location
+    918          918             FanPinHeader_1x04_P2.54mm_Vertical          4                   Connector.pretty
+    4795        4795                PinHeader_1x04_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
+    4796        4796   PinHeader_1x04_P2.54mm_Vertical_SMD_Pin1Left          4  Connector_PinHeader_2.54mm.pretty
+    4797        4797  PinHeader_1x04_P2.54mm_Vertical_SMD_Pin1Right          4  Connector_PinHeader_2.54mm.pretty
+    4946        4946                PinHeader_2x02_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
+    4947        4947            PinHeader_2x02_P2.54mm_Vertical_SMD          4  Connector_PinHeader_2.54mm.pretty
+    >>>
+    # end_src
+
+    OK getting closer I don't want no smd pin header. A bit of
+    contemplation give you the realisation that the bits you want end
+    with 'Vertical.
+
+    4. Try again
+       # begin_src
+     >>> pp.query_footprint_return_all(4, "pinHeader.*2.54.*vertical$")
+     Unnamed: 0                                name  pad_count                           location
+    918          918  FanPinHeader_1x04_P2.54mm_Vertical          4                   Connector.pretty
+    4795        4795     PinHeader_1x04_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
+    4946        4946     PinHeader_2x02_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
+    >>>
+    # end_src
+    The $ sign at the end means that 'vertical' has to be at the end
+    of the line.
+
+    Now ffs what is with the 'FanPinHeader'? It has resolutely stayed
+    at the top of the list. Its got to go.
+    # begin_src
+    >>> pp.query_footprint_return_all(4, "^pinHeader.*2.54.*vertical$")
+      Unnamed: 0                             name  pad_count                           location
+      4795        4795  PinHeader_1x04_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
+      4946        4946  PinHeader_2x02_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
+      >>>
+    # end_src
+    The '^' sign at the beginning means 'pinHeader' is the first thing
+    on the line.
+    You could leave it here and search_part will use the first
+    footprint, but for completeness we will get rid of the remaining
+    option by adding "_1" to 'pinHeader'
+    # begin_src
+    >>> pp.query_footprint_return_all(4, "^pinHeader_1.*2.54.*vertical$")
+    Unnamed: 0                             name  pad_count                           location
+    4795        4795  PinHeader_1x04_P2.54mm_Vertical          4  Connector_PinHeader_2.54mm.pretty
+    >>>
+    # end_src
+    Adding the '_1' to the 'pinHeader' removed the two row pin header.
+
+    While it takes a chunk of time to read and write this process it happens quickly
+    with the interpreter so the above could occur in less than 30 seconds with a
+    little experience.
+
+    Once you have the correct regex copy and paste into your
+    create_part field to get it every time.

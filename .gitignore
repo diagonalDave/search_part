@@ -1,0 +1,6 @@
+*.erc
+*.log
+*.net
+*_sklib.py
+*.csv
+__pycache__/
