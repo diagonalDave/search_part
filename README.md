@@ -40,9 +40,9 @@ Creating a part with search part avoids having to know the storage
 structure of KiCad parts and footprints.
 It is intended to be simple to use:
 ```
-import search\_ part as sp
+import search_ part as sp
 pc = sp.SearchPart()
-ldo = pc.create\_part(8, "LP2951.\*soic", "SOIC") #returns a skidl.Part()
+ldo = pc.create_part(8, "LP2951.*soic", "SOIC") #returns a skidl.Part()
 ```
 To get this simplicity the first part or footprint on the list is
 returned, this may not be the part you want or it may blow-up
