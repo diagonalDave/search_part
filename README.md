@@ -105,7 +105,7 @@ is at least simple if not gratifying.
 4.  Save the file open a cmd prompt/terminal then create an index
     with:
     ```
-    python index\_footprints.py
+    python index_footprints.py
     ```
 This will take 5-10 minutes to run and generate a
 skidl\_footprint\_index.csv file.
